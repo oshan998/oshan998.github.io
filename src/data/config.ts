@@ -32,7 +32,7 @@ export const siteConfig = {
     github: `https://github.com/oshan998`,
     linkedin: 'https://linkedin.com/in/oshann',
     twitter: '',
-    email: 'oshan.nanayakkara@outlook.com',
+    email: '',
   },
   // GitHub integration settings
   github: {
