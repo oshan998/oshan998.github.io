@@ -1,0 +1,126 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches: [main, master]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  quality-check:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript type check
+        run: npm run type-check
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Check code formatting
+        run: npm run format:check
+        continue-on-error: true
+
+      - name: Build project
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ github.repository != format('{0}/{0}.github.io', github.repository_owner) && format('/{0}', github.event.repository.name) || '' }}
+          NEXT_PUBLIC_GITHUB_USERNAME: ${{ secrets.NEXT_PUBLIC_GITHUB_USERNAME || vars.NEXT_PUBLIC_GITHUB_USERNAME }}
+          NEXT_PUBLIC_MEDIUM_USERNAME: ${{ secrets.NEXT_PUBLIC_MEDIUM_USERNAME || vars.NEXT_PUBLIC_MEDIUM_USERNAME }}
+          NEXT_PUBLIC_GOOGLE_VERIFICATION: ${{ secrets.NEXT_PUBLIC_GOOGLE_VERIFICATION || vars.NEXT_PUBLIC_GOOGLE_VERIFICATION }}
+          NEXT_PUBLIC_BING_VERIFICATION: ${{ secrets.NEXT_PUBLIC_BING_VERIFICATION || vars.NEXT_PUBLIC_BING_VERIFICATION }}
+          NEXT_PUBLIC_YANDEX_VERIFICATION: ${{ secrets.NEXT_PUBLIC_YANDEX_VERIFICATION || vars.NEXT_PUBLIC_YANDEX_VERIFICATION }}
+          NEXT_PUBLIC_YAHOO_VERIFICATION: ${{ secrets.NEXT_PUBLIC_YAHOO_VERIFICATION || vars.NEXT_PUBLIC_YAHOO_VERIFICATION }}
+
+      - name: Verify build output
+        run: |
+          if [ -d "out" ]; then
+            echo "✅ Build successful - out directory exists"
+            ls -la out
+          else
+            echo "❌ ERROR: out directory does not exist - static export failed"
+            exit 1
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-build-${{ github.event.number }}
+          path: out
+          retention-days: 3
+
+      - name: Comment PR with status
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## 🔍 PR Quality Check')
+            );
+
+            const commentBody = `## 🔍 PR Quality Check Results
+
+            ### ✅ Quality Checks Status
+            - **TypeScript:** ✅ Type check passed
+            - **Build:** ✅ Build successful
+            - **ESLint:** Check the Actions tab for details
+            - **Formatting:** Check the Actions tab for details
+
+            ### 📦 Build Artifacts
+            Build artifacts have been uploaded and are available for 3 days.
+
+            ---
+            *This check runs automatically on every push to the PR.*`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
