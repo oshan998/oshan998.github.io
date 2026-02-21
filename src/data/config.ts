@@ -31,7 +31,7 @@ export const siteConfig = {
   links: {
     github: `https://github.com/oshan998`,
     linkedin: 'https://linkedin.com/in/oshann',
-    //twitter: 'https://x.com/yourusername',
+    twitter: '',
     email: 'oshan.nanayakkara@outlook.com',
   },
   // GitHub integration settings
