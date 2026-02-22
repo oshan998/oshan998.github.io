@@ -102,7 +102,7 @@ export const timelineData: TimelineItem[] = [
   {
     id: '2',
     type: 'work',
-    title: 'Associate Software Developer',
+    title: 'Associate Software Engineer',
     subtitle: 'Virtusa Pvt. Ltd.',
     date: new Date('2022-02-28'),
     endDate: new Date('2023-11-01'),
@@ -121,7 +121,7 @@ export const timelineData: TimelineItem[] = [
   {
     id: '3',
     type: 'work',
-    title: 'Software Developer',
+    title: 'Software Engineer',
     subtitle: 'Virtusa Pvt. Ltd.',
     date: new Date('2023-11-02'),
     endDate: new Date('2024-08-02'),
@@ -141,7 +141,7 @@ export const timelineData: TimelineItem[] = [
   {
     id: '4',
     type: 'work',
-    title: 'Software Developer',
+    title: 'Software Engineer',
     subtitle: 'IFS R&D Pvt. Ltd.',
     date: new Date('2024-08-05'),
     endDate: new Date('2026-01-31'),
