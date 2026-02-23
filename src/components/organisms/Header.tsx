@@ -82,7 +82,7 @@ export function Header() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="container mx-auto px-6 py-0">
+      <nav className="container mx-auto px-6 py-0 -my-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.button
@@ -91,7 +91,7 @@ export function Header() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="relative h-[72px] w-[72px]">
+            <div className="relative h-[90px] w-[90px]">
               <Image
                 src={theme === 'dark' ? siteConfig.logo.dark : siteConfig.logo.light}
                 alt={siteConfig.name}
