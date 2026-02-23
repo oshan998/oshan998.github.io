@@ -9,6 +9,10 @@ export const siteConfig = {
   url: 'https://oshan998.github.io',
   ogImage: '/og-image.jpg',
   profileImage: '/profile.png', // Add your profile image path here, e.g., '/profile.jpg'
+  logo: {
+    light: '/logo1.png', // Logo for light mode
+    dark: '/logo2.png', // Logo for dark mode
+  },
   keywords: [
     'software engineer',
     'web developer',

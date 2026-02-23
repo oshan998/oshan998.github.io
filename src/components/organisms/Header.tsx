@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { navigation, siteConfig } from '@/data/config';
 import { MenuIcon, CloseIcon } from '@/components/icons';
 import { ThemeSwitcher } from '@/components/atoms/ThemeSwitcher';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +14,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const isProgrammaticScroll = useRef(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,16 +82,24 @@ export function Header() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="container mx-auto px-6 py-4">
+      <nav className="container mx-auto px-6 py-0">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.button
             onClick={() => scrollToSection('#hero')}
-            className="cursor-pointer text-xl font-bold text-slate-900 transition-colors hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-300"
+            className="ml-4 cursor-pointer transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            {siteConfig.name}
+            <div className="relative h-[72px] w-[72px]">
+              <Image
+                src={theme === 'dark' ? siteConfig.logo.dark : siteConfig.logo.light}
+                alt={siteConfig.name}
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           </motion.button>
 
           {/* Desktop Navigation */}
