@@ -87,7 +87,7 @@ export function Header() {
           {/* Logo */}
           <motion.button
             onClick={() => scrollToSection('#hero')}
-            className="ml-4 cursor-pointer transition-colors"
+            className="ml-1 cursor-pointer transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
